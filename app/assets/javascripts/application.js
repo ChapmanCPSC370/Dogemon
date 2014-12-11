@@ -12,6 +12,9 @@
 //
 //= require jquery
 //= require jquery_ujs
-//= require turbolinks
-//= require bootstrap-slider
-//= require_tree .
+//= require bootstrap
+//= require bootstrap-material-design
+//= require forem
+$(document).on("ready page:change", function() {
+    $('.tag-tooltip').tooltip();
+});

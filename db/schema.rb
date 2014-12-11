@@ -11,7 +11,25 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141003085030) do
+ActiveRecord::Schema.define(version: 20141112081275) do
+
+  create_table "admin_users", force: true do |t|
+    t.string   "email",                  default: "", null: false
+    t.string   "encrypted_password",     default: "", null: false
+    t.string   "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
+    t.integer  "sign_in_count",          default: 0,  null: false
+    t.datetime "current_sign_in_at"
+    t.datetime "last_sign_in_at"
+    t.string   "current_sign_in_ip"
+    t.string   "last_sign_in_ip"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "admin_users", ["email"], name: "index_admin_users_on_email", unique: true
+  add_index "admin_users", ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
 
   create_table "aenemies", force: true do |t|
     t.integer  "health"
@@ -29,13 +47,8 @@ ActiveRecord::Schema.define(version: 20141003085030) do
     t.integer  "battle_id"
   end
 
-  create_table "battle_logs", force: true do |t|
-    t.string   "description"
-    t.string   "type"
-    t.integer  "battle_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
+# Could not dump table "battle_logs" because of following NoMethodError
+#   undefined method `[]' for nil:NilClass
 
   create_table "battle_moves", force: true do |t|
     t.integer  "battle_id"
@@ -47,12 +60,15 @@ ActiveRecord::Schema.define(version: 20141003085030) do
     t.datetime "updated_at"
   end
 
-  create_table "battles", force: true do |t|
+# Could not dump table "battles" because of following NoMethodError
+#   undefined method `[]' for nil:NilClass
+
+  create_table "blogs", force: true do |t|
     t.integer  "user_id"
-    t.integer  "enemy_id"
+    t.string   "title"
+    t.text     "description"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "aenemy_id"
   end
 
   create_table "colusseums", force: true do |t|
@@ -76,6 +92,152 @@ ActiveRecord::Schema.define(version: 20141003085030) do
     t.string   "imageurl"
   end
 
+  create_table "equipment", force: true do |t|
+    t.integer  "pet_id"
+    t.integer  "item_inst_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "sale_id"
+  end
+
+  create_table "feedbacks", force: true do |t|
+    t.integer  "user_id"
+    t.string   "feedback_type"
+    t.text     "content"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "forem_categories", force: true do |t|
+    t.string   "name",                   null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "slug"
+    t.integer  "position",   default: 0
+  end
+
+  add_index "forem_categories", ["slug"], name: "index_forem_categories_on_slug", unique: true
+
+  create_table "forem_forums", force: true do |t|
+    t.string  "name"
+    t.text    "description"
+    t.integer "category_id"
+    t.integer "views_count", default: 0
+    t.string  "slug"
+    t.integer "position",    default: 0
+  end
+
+  add_index "forem_forums", ["slug"], name: "index_forem_forums_on_slug", unique: true
+
+  create_table "forem_groups", force: true do |t|
+    t.string "name"
+  end
+
+  add_index "forem_groups", ["name"], name: "index_forem_groups_on_name"
+
+  create_table "forem_memberships", force: true do |t|
+    t.integer "group_id"
+    t.integer "member_id"
+  end
+
+  add_index "forem_memberships", ["group_id"], name: "index_forem_memberships_on_group_id"
+
+  create_table "forem_moderator_groups", force: true do |t|
+    t.integer "forum_id"
+    t.integer "group_id"
+  end
+
+  add_index "forem_moderator_groups", ["forum_id"], name: "index_forem_moderator_groups_on_forum_id"
+
+  create_table "forem_posts", force: true do |t|
+    t.integer  "topic_id"
+    t.text     "text"
+    t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "reply_to_id"
+    t.string   "state",       default: "pending_review"
+    t.boolean  "notified",    default: false
+  end
+
+  add_index "forem_posts", ["reply_to_id"], name: "index_forem_posts_on_reply_to_id"
+  add_index "forem_posts", ["state"], name: "index_forem_posts_on_state"
+  add_index "forem_posts", ["topic_id"], name: "index_forem_posts_on_topic_id"
+  add_index "forem_posts", ["user_id"], name: "index_forem_posts_on_user_id"
+
+  create_table "forem_subscriptions", force: true do |t|
+    t.integer "subscriber_id"
+    t.integer "topic_id"
+  end
+
+  create_table "forem_topics", force: true do |t|
+    t.integer  "forum_id"
+    t.integer  "user_id"
+    t.string   "subject"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.boolean  "locked",       default: false,            null: false
+    t.boolean  "pinned",       default: false
+    t.boolean  "hidden",       default: false
+    t.datetime "last_post_at"
+    t.string   "state",        default: "pending_review"
+    t.integer  "views_count",  default: 0
+    t.string   "slug"
+  end
+
+  add_index "forem_topics", ["forum_id"], name: "index_forem_topics_on_forum_id"
+  add_index "forem_topics", ["slug"], name: "index_forem_topics_on_slug", unique: true
+  add_index "forem_topics", ["state"], name: "index_forem_topics_on_state"
+  add_index "forem_topics", ["user_id"], name: "index_forem_topics_on_user_id"
+
+  create_table "forem_views", force: true do |t|
+    t.integer  "user_id"
+    t.integer  "viewable_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "count",             default: 0
+    t.string   "viewable_type"
+    t.datetime "current_viewed_at"
+    t.datetime "past_viewed_at"
+  end
+
+  add_index "forem_views", ["updated_at"], name: "index_forem_views_on_updated_at"
+  add_index "forem_views", ["user_id"], name: "index_forem_views_on_user_id"
+  add_index "forem_views", ["viewable_id"], name: "index_forem_views_on_viewable_id"
+
+  create_table "ghost_logs", force: true do |t|
+    t.integer  "battle_id"
+    t.string   "description"
+    t.string   "type"
+    t.boolean  "bMessage"
+    t.integer  "item_id"
+    t.integer  "pet_id"
+    t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "utility_type"
+    t.integer  "ghost_id"
+    t.integer  "rand_amount"
+  end
+
+  create_table "ghosts", force: true do |t|
+    t.integer  "pet_id"
+    t.string   "name"
+    t.float    "health"
+    t.float    "magic"
+    t.text     "description"
+    t.integer  "user_id"
+    t.string   "element"
+    t.string   "imageurl"
+    t.integer  "battle_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "item1_id"
+    t.integer  "item2_id"
+    t.integer  "item3_id"
+    t.integer  "item4_id"
+  end
+
   create_table "item_insts", force: true do |t|
     t.integer  "item_id"
     t.integer  "user_id"
@@ -91,6 +253,15 @@ ActiveRecord::Schema.define(version: 20141003085030) do
     t.string   "imageurl"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "element"
+    t.string   "category"
+    t.integer  "attack"
+    t.integer  "magic"
+    t.integer  "turns"
+    t.float    "boost"
+    t.integer  "creator_id"
+    t.integer  "downloads"
+    t.string   "utility_type"
   end
 
   create_table "logs", force: true do |t|
@@ -107,6 +278,41 @@ ActiveRecord::Schema.define(version: 20141003085030) do
     t.datetime "updated_at"
   end
 
+  create_table "monologue_posts", force: true do |t|
+    t.boolean  "published"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "user_id"
+    t.string   "title"
+    t.text     "content"
+    t.string   "url"
+    t.datetime "published_at"
+  end
+
+  add_index "monologue_posts", ["url"], name: "index_monologue_posts_on_url", unique: true
+
+  create_table "monologue_taggings", force: true do |t|
+    t.integer "post_id"
+    t.integer "tag_id"
+  end
+
+  add_index "monologue_taggings", ["post_id"], name: "index_monologue_taggings_on_post_id"
+  add_index "monologue_taggings", ["tag_id"], name: "index_monologue_taggings_on_tag_id"
+
+  create_table "monologue_tags", force: true do |t|
+    t.string "name"
+  end
+
+  add_index "monologue_tags", ["name"], name: "index_monologue_tags_on_name"
+
+  create_table "monologue_users", force: true do |t|
+    t.string   "name"
+    t.string   "email"
+    t.string   "password_digest"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "pets", force: true do |t|
     t.string   "imageurl"
     t.string   "name"
@@ -114,6 +320,39 @@ ActiveRecord::Schema.define(version: 20141003085030) do
     t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "health"
+    t.integer  "magic"
+    t.integer  "pvp_battle_id"
+    t.string   "element"
+    t.integer  "battle_id"
+    t.integer  "ghost_wins"
+    t.integer  "ghost_losses"
+    t.integer  "player_wins"
+    t.integer  "player_losses"
+    t.string   "favorite_activity"
+    t.string   "disposition"
+    t.integer  "against_ghost_wins"
+    t.integer  "against_ghost_losses"
+  end
+
+  create_table "posts", force: true do |t|
+    t.integer  "user_id"
+    t.string   "title"
+    t.text     "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "pvp_battles", force: true do |t|
+    t.integer  "user_id"
+    t.integer  "other_id"
+    t.string   "battle_state"
+    t.boolean  "user1_turn"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "pet1_id"
+    t.integer  "pet2_id"
+    t.integer  "winner_id"
   end
 
   create_table "sales", force: true do |t|
@@ -121,6 +360,7 @@ ActiveRecord::Schema.define(version: 20141003085030) do
     t.integer  "item_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "equipment_id"
   end
 
   create_table "towns", force: true do |t|
@@ -131,13 +371,21 @@ ActiveRecord::Schema.define(version: 20141003085030) do
     t.datetime "updated_at"
   end
 
+  create_table "transactions", force: true do |t|
+    t.integer  "user_id"
+    t.string   "address"
+    t.integer  "amount"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "users", force: true do |t|
-    t.string   "email",                  default: "", null: false
-    t.string   "encrypted_password",     default: "", null: false
+    t.string   "email",                  default: "",               null: false
+    t.string   "encrypted_password",     default: "",               null: false
     t.string   "reset_password_token"
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
-    t.integer  "sign_in_count",          default: 0,  null: false
+    t.integer  "sign_in_count",          default: 0,                null: false
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
     t.string   "current_sign_in_ip"
@@ -154,6 +402,13 @@ ActiveRecord::Schema.define(version: 20141003085030) do
     t.integer  "total_health"
     t.integer  "magic"
     t.integer  "attack"
+    t.float    "coin_made"
+    t.integer  "block_io_wallet_id"
+    t.string   "channel_key"
+    t.boolean  "if_accepted_terms"
+    t.boolean  "forem_admin",            default: false
+    t.string   "forem_state",            default: "pending_review"
+    t.boolean  "forem_auto_subscribe",   default: false
   end
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true

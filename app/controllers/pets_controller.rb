@@ -1,12 +1,16 @@
 class PetsController < ApplicationController
   before_action :set_pet, only: [:show, :edit, :update, :destroy]
-
+before_filter :authenticate_user!
   # GET /pets
   # GET /pets.json
   def index
     @pets = current_user.pets.all
   end
-
+  def challenge
+    @pet = Pet.find(params[:pet_id])
+    @user = @pet.user
+    @sales = @user.sales
+  end
   # GET /pets/1
   # GET /pets/1.json
   def show
@@ -33,7 +37,7 @@ class PetsController < ApplicationController
 
     respond_to do |format|
       if @pet.save
-        format.html { redirect_to pets_path, notice: 'Pet was successfully created.' }
+        format.html { redirect_to @user, notice: 'Pet was successfully created.' }
         format.json { render :show, status: :created, location: @pet }
       else
         format.html { render :new }
@@ -59,9 +63,10 @@ class PetsController < ApplicationController
   # DELETE /pets/1
   # DELETE /pets/1.json
   def destroy
+    @user = @pet.user
     @pet.destroy
     respond_to do |format|
-      format.html { redirect_to pets_url, notice: 'Pet was successfully destroyed.' }
+      format.html { redirect_to @user, notice: 'Pet was successfully destroyed.' }
       format.json { head :no_content }
     end
   end
@@ -74,6 +79,6 @@ class PetsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def pet_params
-      params.require(:pet).permit(:imageurl, :name, :description, :user_id)
+      params.require(:pet).permit(:against_ghost_losses, :against_ghost_wins, :element, :health, :magic, :pvp_battle_id, :imageurl, :name, :description, :user_id, :ghost_wins, :ghost_losses, :player_wins, :player_losses, :favorite_activity, :disposition)
     end
 end

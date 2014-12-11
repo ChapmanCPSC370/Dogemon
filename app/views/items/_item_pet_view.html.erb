@@ -1,0 +1,16 @@
+<div class="col-md-4">
+  <div class="well">
+    <% if item.presence %>
+    <%= item_element_button(Item.find(item.item_id).element, Item.find(item.item_id).name, Item.find(item.item_id)) %><br>
+    <center><%= image_tag(Item.find(item.item_id).imageurl, height: "150px") %><br><br></center>
+    <p class=""><i>"<%= truncate(Item.find(item.item_id).description, length: 23) %>"</i></p><h4>
+
+   <%= Item.find(item.item_id).utility_type %> <%= Item.find(item.item_id).attack %> / Magic <%= Item.find(item.item_id).magic %></h4>
+    
+    <% amount = item.attack %>
+    <% end %>
+    <%= link_to "Unequip", equipment, method: :delete, class: 'btn btn-block btn-default' %>
+    
+  </div>
+</div>
+                                                                                                                                                                                         

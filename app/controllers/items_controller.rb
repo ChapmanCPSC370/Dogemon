@@ -1,10 +1,27 @@
 class ItemsController < ApplicationController
   before_action :set_item, only: [:show, :edit, :update, :destroy]
-
+before_filter :authenticate_user!
   # GET /items
   # GET /items.json
   def index
     @items = Item.all
+  end
+  
+  def grid
+    sort_type = params[:sort_type]
+    if (sort_type == "Newest")
+      @items = Item.paginate(:page => params[:page], :per_page => 16).order('created_at DESC')
+    elsif (sort_type == "Oldest")
+      @items = Item.paginate(:page => params[:page], :per_page => 16).order('created_at ASC')
+    elsif (sort_type == "Most Downloads")
+      @items = Item.paginate(:page => params[:page], :per_page => 16).order('downloads DESC')
+    elsif (sort_type == "Highest Price")
+      @items = Item.paginate(:page => params[:page], :per_page => 16).order('worth DESC')
+    elsif (sort_type == "Lowest Price")
+      @items = Item.paginate(:page => params[:page], :per_page => 16).order('worth ASC')
+    else
+      @items = Item.paginate(:page => params[:page], :per_page => 16).order('created_at ASC')
+    end
   end
 
   # GET /items/1
@@ -27,10 +44,10 @@ class ItemsController < ApplicationController
 
     if @item.market_item_votes.create(user_id: current_user.id)
       flash[:notice] =  "Thank you for upvoting!"
-      redirect_to(items_path)
+      redirect_to(items_grid_path)
     else 
       flash[:notice] =  "You have already upvoted this!"
-      redirect_to(items_path)
+      redirect_to(items_grid_path)
     end
   end
 
@@ -38,7 +55,8 @@ class ItemsController < ApplicationController
   # POST /items.json
   def create
     @item = Item.new(item_params)
-
+    @item.update_attribute(:magic, @item.attack * 1.5)
+    @item.update_attribute(:worth, @item.attack * 10)
     respond_to do |format|
       if @item.save
         format.html { redirect_to @item, notice: 'Item was successfully created.' }
@@ -69,7 +87,7 @@ class ItemsController < ApplicationController
   def destroy
     @item.destroy
     respond_to do |format|
-      format.html { redirect_to items_url, notice: 'Item was successfully destroyed.' }
+      format.html { redirect_to items_grid_path, notice: 'Item was successfully destroyed.' }
       format.json { head :no_content }
     end
   end
@@ -82,6 +100,6 @@ class ItemsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def item_params
-      params.require(:item).permit(:id, :name, :description, :worth, :imageurl)
+      params.require(:item).permit(:utility_type, :downloads, :creator_id, :id, :name, :description, :worth, :imageurl, :element, :category, :attack, :magic, :turns, :boost)
     end
 end

@@ -10,17 +10,46 @@
  * defined in the other CSS/SCSS files in this directory. It is generally better to create a new
  * file per style scope.
  *
- *= require_tree .
+*= require bootstrap-material-design
  *= require_self
- *= require bootstrap-slider
-
+*= require 'forem/base'
+*= require "forem-bootstrap"
  */
-@import "bootswatch/readable/variables";
-@import "bootstrap-sprockets";
+//@import "bootswatch/lumen/variables";
+//$navbar-default-color: white;
+//$navbar-default-link-color: white;
+//$navbar-inverse-color: white;
+//$navbar-inverse-bg: #CFD8DC;
+//$navbar-inverse-link-color: white;
 @import "bootstrap";
 @import "font-awesome";
 body {
-  padding-top: 70px;
+  padding-top: 80px;
 }
 
-@import "bootswatch/readable/bootswatch";
+.navbar-brand{
+ // padding-top:0 !important;
+}
+
+.footer{
+  margin-top:50px;
+  margin-bottom:50px;
+  
+}
+
+.btn-item{
+  width:70px;
+}
+
+.balance{
+ // margin-top:10px;
+}
+
+.form-control {
+  color: black;
+}
+
+ .input-mini { width: 60px; } .input-small { width: 90px; } .input-medium { width: 150px; } .input-large { width: 210px; } .input-xlarge { width: 270px; } .input-xxlarge { width: 530px; }
+
+//@import "bootswatch/lumen/bootswatch";
+

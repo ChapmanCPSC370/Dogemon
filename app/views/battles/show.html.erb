@@ -1,116 +1,57 @@
-<p id="notice"><%= notice %></p>
-
-<%= link_to 'Edit', edit_battle_path(@battle) %> |
-<%= link_to 'Back', battles_path %>
-<div class="row">
-  <div class="col-md-6">
-    <center><%= image_tag @user.imageurl, width: 100 %></center>
-  </div>
-    <div class="col-md-6">
-    <% @aenemies.each do |f| %>
-    <center>
-      <%= image_tag f.imageurl, width: 100 %><% end %></center>
-  </div>
-</div>
-<div class="row">
-  <div class="col-md-6">
-    <center>
-      <h3><%= link_to @user.dogetag, @user %></h3>
-    </center>
-    <div class="progress">
-      <div class="progress-bar " role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: <%= Integer(@user.health.to_f/@user.total_health.to_f * 100) %>%;">
-        <span class="sr-onl"><%= @user.health %>/<%= @user.total_health %></span>
-      </div>
-      <div class="progress-bar progress-bar-danger" role="" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: <%= 100 - Integer(@user.health.to_f/@user.total_health.to_f * 100) %>%"></div>
-    </div>
-  </div>
-  <div class="col-md-6">
-    <% @aenemies.each do |f| %>
-    <center>
-      <h3><%= link_to f.name, f %></h3>
-    </center>
-    <div class="progress">
-      <div class="progress-bar " role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: <%= Integer(f.health.to_f/@enemy.health.to_f * 100) %>%;">
-     <span class="sr-onl"><%= f.health %>/<%= @enemy.health %></span>
-    </div><div class="progress-bar progress-bar-danger" role="" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: <%= 100 - Integer(f.health.to_f/@enemy.health.to_f * 100) %>%"></div>
-    <% end %>
-  </div>
-</div>
-
-<div class="row">
-  <ul class="nav navbar-nav"><li>
-<%= form_for [@battle, BattleLog.new], class: "horizontal-", url: {controller: :battle_logs, battle_id: @battle.id, amount: 5 } do |f| %> 
-  <%= f.hidden_field :battle_id %>
-  <%= f.hidden_field :description, value: @user.email + " attacks " + " for 5 damage" %>
-  <%= f.submit "Attack", class: "btn btn-lg btn-primary" %>
-    <% end %></li><li> 
-<%= form_for [@battle, BattleLog.new], class: "horizontal-", url: {controller: :battle_logs, battle_id: @battle.id, amount: 5 } do |f| %> 
-  <%= f.hidden_field :battle_id %>
-  <%= f.hidden_field :description, value: @user.email + " attacks " + " for 5 damage" %>
-  <%= f.submit "Magic", class: "btn btn-lg btn-primary" %>
-<% end %></li><li> 
-<%= form_for [@battle, BattleLog.new], class: "horizontal-", url: {controller: :battle_logs, battle_id: @battle.id, amount: 5 } do |f| %>  
-  <%= f.hidden_field :battle_id %>
-  <%= f.hidden_field :description, value: @user.email + " attacks " + " for 5 damage" %>
-  <%= f.submit "Item", class: "btn btn-lg btn-primary" %>
-<% end %></li><li> 
-<%= form_for [@battle, BattleLog.new], class: "horizontal-", url: {controller: :battle_logs, battle_id: @battle.id, amount: 5 } do |f| %> 
-  <%= f.hidden_field :battle_id %>
-  <%= f.hidden_field :description, value: @user.email + " attacks " + " for 5 damage" %>
-<%= f.submit "Flee", class: "btn btn-lg btn-primary" %>
-    <% end %></li><li></ul>
-  </div>
-<br>
-
-  <p>
-  <%= form_for [@battle, Aenemy.new], url: {controller: :aenemies, battle_id: @battle.id } do |f| %>
-  <%= f.hidden_field :battle_id %>
-  <%= f.hidden_field :health, value: @enemy.health %>
-  <%= f.hidden_field :description, value: @enemy.description %>
-  <%= f.hidden_field :name, value: @enemy.name %>
-  <%= f.hidden_field :attack, value: @enemy.attack %>
-  <%= f.hidden_field :imageurl, value: @enemy.imageurl %>
-  <%= f.submit %>
+<% if @battle.battle_state == "completed" %>
+<h2><center><% if @battle.b_pet_winner == true %>
+  <%= image_tag @battle.pet.imageurl %> <%= link_to @battle.pet.name, @battle.pet %> WINS!
+  <% else %>
+  <%= image_tag @battle.ghost.imageurl %> <%= link_to @battle.ghost.name, @battle.ghost %> WINS!
   <% end %>
-</p>
-
-<p>
-  <strong>User:</strong>
-  <%= @user.email %>
-  <br>
-  HP: 100 MP: 100
-</p>
-
-<p>
-  <strong>AEnemy:</strong>
-  <% @aenemies.each do |f| %>
-  <%= image_tag(f.imageurl) %>
-  <%= link_to "d", f, method: :delete %>
-  <%= f.enemy_id %>
-  <br>
-  <div class="col-md-3">
-<div class="progress">
-  <div class="progress-bar " role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: <%= Integer(f.health.to_f/@enemy.health.to_f * 100) %>%;">
-    <span class="sr-onl"><%= f.health %>/<%= @enemy.health %></span>
+  </h2><center>
+  <%= link_to "Back to Battle Arena", pvp_battles_path %>
+  </center>
+<% else %>
+<% if @ghost_logs.last.presence %>
+<div class="well">
+  <% if @battle.b_pet_turn == false or @battle.b_pet_turn == 'false' %>
+  <div class="pull-right">
+    <%= link_to "Next Turn", battle_ghost_attack_path(@battle), class: 'btn btn-lg btn-primary' %>
+    <%= link_to "?", "#", class: 'btn btn-lg btn-default tag-tooltip', data: {:toggle=>"tooltip"}, 'data-original-title' => "Your turn has ended, so click Next Turn to have the enemy Dogemon play their move", 'data-placement' => 'bottom' %>
   </div>
-    </div>
-</div><br>
-<p>
   <% end %>
-</p>
-  
-Force Enemy Move: 
-<%= link_to "Attack", @battle %> | 
-<%= link_to "Magic", @battle %> | 
-<%= link_to "Item", @battle %> | 
-<%= link_to "Flee", @battle %> | 
-<br>
-</strong>
-
-<p>Moves played:</p>
-<% @battle_logs.order("created_at desc").each do |f| %>
-  <p>
-    <%= f.created_at.strftime("%I:%M %p") %> | 
-    <strong><%= f.description %></strong>
-  </p>
+  <h2>
+    <%= image_tag @last_pet.imageurl, width: 100 %> <%= @last_log.description %> <% if @last_log.item_id.presence %><%= @last_pet.name %> uses <%= image_tag @last_item.imageurl, width: 100 %> "<%=  @last_item.name %>" for  
+    <%= @last_item.attack %><% if @last_log.rand_amount.presence %>+<%= @last_log.rand_amount %><% end %> <%= @last_item.utility_type %> <% end %>
+  </h2>
+</div>
 <% end %>
+<div class="well">
+    <div class="row">
+  <div class="col-md-6">
+    <center><h3><%= link_to @battle.user.dogetag, @battle.user %><% if current_user.id == @battle.user_id %> (you) <% end %></h3>
+      <%= render partial: "pets/pet_overview", locals: { pet: @battle.pet } %>    </center>
+
+   
+
+  </div>
+  <div class="col-md-6">
+    
+    <center><h3><%= link_to @battle.ghost.user.dogetag, @battle.ghost.user %></h3>
+       <%= render partial: "ghosts/ghost_overview", locals: { pet: @battle.ghost } %>    </center>
+   
+    </div>
+  </div>
+</div>
+  <% if @battle.b_pet_turn == true or @battle.b_pet_turn == 'true' %>
+  <% if current_user.id == @battle.user_id %>
+<div class="row"><center><h3>Your turn!</h3></center>
+      <% @battle.pet.equipments.each do |f| %>
+        <%= render partial: "items/item_ghost_view", locals: { item: f.sale, equipment: f } %>
+      <% end %>
+</div>
+        <%= form_for [@battle, GhostLog.new], html: { id: 'form_id3' } , class: "form form-inline  form-horizontal ", url: {bMessage: false, controller: :ghost_logs, battle_id: @battle.id, amount: 0, magic_amount: 0, attacker: 2, defender: 2 } do |f| %> 
+<%= f.hidden_field :battle_id, value: @battle.id %>
+<%= f.hidden_field :pet_id, value: @battle.pet_id %>
+<%= f.hidden_field :description, value: Pet.find(@battle.pet_id).name + " skips its turn. " %>
+          <%= f.hidden_field :bMessage, value: 'false' %>
+          <%= f.submit "Skip turn?", class: "btn btn-block btn-default" %>
+        <% end %>
+    <% end %>
+  <% end %><% end %>
